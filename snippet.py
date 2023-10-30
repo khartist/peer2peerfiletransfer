@@ -14,7 +14,8 @@ def discover(ip):
     if not ping(ip): 
         return False
     self.server_socket.listen(1)
-
+    self.server_socket.bind((self.HOST, self.PORT))
+    self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     conn, addr = s.accept()
     num_files = int(conn.recv(1024).decode())
         
