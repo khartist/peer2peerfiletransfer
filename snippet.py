@@ -13,9 +13,11 @@ def ping(self, ip):
 def discover(ip):
     if not ping(ip): 
         return False
-    self.server_socket.listen(1)
-    self.server_socket.bind((self.HOST, self.PORT))
+    #tao socket moi de noi vo, lam nhiem vu nhan file name
     self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    self.server_socket.bind((self.HOST, self.PORT))
+    self.server_socket.listen(1)
+    
     conn, addr = s.accept()
     num_files = int(conn.recv(1024).decode())
         
@@ -29,4 +31,5 @@ def discover(ip):
         filenames.append(filename)
         
     conn.close()
+    # ktra vu viet vao dbms
     return True
