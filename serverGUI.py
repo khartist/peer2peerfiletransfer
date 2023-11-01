@@ -2,17 +2,7 @@ from tkinter import *
 from tkinter import font
 from tkinter import Image
 import tkinter.messagebox
-import sqlite3
-connection = sqlite3.connect('users.db')
-cursor = connection.cursor()
-
-command1 = """
-    CREATE TABLE IF NOT EXISTS
-    USERS(username text, password text)
-"""
-cursor.execute(command1)
-
-cursor.execute()
+import server
 
 class FirstPage(Tk):
     def __init__(self):
@@ -48,7 +38,7 @@ class FirstPage(Tk):
         self.destroy()
 
 
-FILE_LIST = {'a.txt','b.pdf','c.docx','d.pdf','e.pptx', 'f.txt', 'm.txt', 'xxx.txt', 'lol.exe', 'ciscoPacketTrace.txt', 'yyy.txt'}
+#FILE_LIST = {('0.0.0.0', 'a.txt')}
 class ListPage(Tk):
     def __init__(self):
         super().__init__() 
@@ -56,7 +46,7 @@ class ListPage(Tk):
         self.title('File Transfer Admin')
         self.geometry("700x250")
         
-        listFrame = Frame(self, bg="black")
+        listFrame = Frame(self, bg="#fff")
         label = Label(listFrame, text = "File list")
         listbox = Listbox(listFrame, height = 10, 
                   width = 15, 
@@ -64,10 +54,12 @@ class ListPage(Tk):
                   activestyle = 'dotbox', 
                   font = "Helvetica",
                   fg = "yellow")
-        i = 1
+        FILE_LIST = server.getFileList()
         for item in FILE_LIST: 
-            listbox.insert(i, item)
-            i = i + 1
+            ip = item[0]
+            file = item[1]
+            display_text = f"{ip}:{file}"
+            listbox.insert("end", display_text)
 
         #scrollbar
         scrollbar =Scrollbar(listFrame, orient= 'vertical')
