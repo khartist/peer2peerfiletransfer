@@ -62,6 +62,18 @@ def login(username, password):
         else: print("Fuck you bastard")
 
 
+def register(username, password):
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.connect(('127.0.0.1', 8080))
+        msg = str("register,"+username+','+password)
+        s.send(msg.encode())
+
+        response = pickle.loads(s.recv(1024))
+        if response['status'] == 'True':
+            print("Successfully registered")
+        else: print("Fuck you bastard")
+
+
 f1 = input("Type in your username:")
 f2 = input("Type in your password:")
 login(f1, f2)
