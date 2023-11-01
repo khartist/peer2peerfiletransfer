@@ -6,19 +6,23 @@ connection = sqlite3.connect('users.db')
 
 cursor = connection.cursor()
 
-command1 = """CREATE TABLE IF NOT EXISTS USERS(username text, password text, ip text)"""
-command2 = """CREATE TABLE IF NOT EXISTS FILE(file text, ip text)"""
-
+command1 = """CREATE TABLE IF NOT EXISTS USERS(username text, password text)"""
+command2 = """CREATE TABLE IF NOT EXISTS FILES(ip text, file text)"""
 
 cursor.execute(command1)
 cursor.execute(command2)
-cursor.execute("INSERT INTO FILE VALUES('127.0.0.1', 'sdfdasf.txt')")
-cursor.execute("INSERT INTO USERS VALUES('user1', 'pass1', '127.0.0.1')")
-cursor.execute("INSERT INTO USERS VALUES('user2', 'pass2', '127.0.0.2')")
-cursor.execute("INSERT INTO USERS VALUES('user3', 'pass3', '127.0.0.1')")
-cursor.execute("INSERT INTO USERS VALUES('user4', 'pass4', '127.0.0.2')")
-cursor.execute("INSERT INTO USERS VALUES('user5', 'pass5', '127.0.0.1')")
-cursor.execute("INSERT INTO USERS VALUES('user6', 'pass6', '127.0.0.2')")
+cursor.execute("INSERT INTO FILES VALUES('0.0.0.0', 'a.txt')")
+cursor.execute("INSERT INTO FILES VALUES('1.1.1.1', 'v.jpeg')")
+cursor.execute("INSERT INTO FILES VALUES('2.2.2.2', 'l.png')")
+cursor.execute("INSERT INTO FILES VALUES('3.3.3.3', 'g.jpg')")
+cursor.execute("INSERT INTO FILES VALUES('4.4.4.4', 'e.pptx')")
+cursor.execute("INSERT INTO FILES VALUES('5.5.5.5', 'f.pdf')")
+cursor.execute("INSERT INTO USERS VALUES('user1', 'pass1')")
+cursor.execute("INSERT INTO USERS VALUES('user2', 'pass2')")
+cursor.execute("INSERT INTO USERS VALUES('user3', 'pass3')")
+cursor.execute("INSERT INTO USERS VALUES('user4', 'pass4')")
+cursor.execute("INSERT INTO USERS VALUES('user5', 'pass5')")
+cursor.execute("INSERT INTO USERS VALUES('user6', 'pass6')")
 
 #clients = {
     #'127.0.0.1': ['aoyama.png', 'chino.png', 'chiya.png'],
@@ -29,6 +33,7 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind(('0.0.0.0', 8080))
 s.listen(5)
 
+#query into user table
 def getUserTable():
     cursor.execute("SELECT * FROM USERS")
     results = cursor.fetchall()
@@ -62,8 +67,43 @@ def loginService(username, password):
 #register
 def register(username, password):
     cursor.execute("INSERT INTO USERS VALUE(?, ?)", (username, password))
+    print(f"{username} has succesfully registered")
 
-while True:  
+#query voi file list
+def getFileList():
+    cursor.execute("SELECT * FROM FILES")
+    results = cursor.fetchall()
+    file_list = []
+    for result in results:
+        ip = result[0]
+        file = result[1]
+        file_list.append((ip, file))
+    return file_list
+
+def getFileFromList(name):
+    results = getFileList()
+    for result in results:
+        if(name == result[2]):
+            print("Find that file in db")
+            return True
+    print("Sorry, can not find that file in db")
+    return False
+
+def createNewFileLog(ip ,name):
+    cursor.execute("INSERT INTO FILES VALUE(?, ?)", (ip, name))
+    print(f"{ip}'s repo has succesfully registered")
+
+def findFileByIP(ip):
+    cursor.execute("SELECT file FROM FILES WHERE ip = ?", (ip))
+    result = cursor.fetchall()
+    if result is None:
+        print("Cannot find anything bro")
+        return result
+    print(f"Oh there is something in this address {ip}\n")
+    return result
+
+
+'''while True:  
     conn, addr = s.accept()
     msg = conn.recv(1024).decode()
     
@@ -74,4 +114,4 @@ while True:
         loginService(part[1], part[2])
     elif (cmd == "register"):
         register(part[1], part[2])
-    
+    '''
