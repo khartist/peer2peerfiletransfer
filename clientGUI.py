@@ -2,8 +2,6 @@ from tkinter import *
 from tkinter import font
 from tkinter import Image
 import tkinter.messagebox
-import sqlite3
-import re
 
 class FirstPage(Tk):
     def __init__(self):
@@ -75,7 +73,7 @@ class RegistryFrame(Frame):
            # user.bind('<FocusOut>', lambda event: on_leave(event, "user"))
             #Frame(self, width=295, height=2,bg='black').place(x=95,y=120)
 
-            passwd = Entry(self, width=30, border=0)
+            passwd = Entry(self, width=30, border=0, show="*")
             passwd.place(x=400,y=150)
             passwd.insert(0,'Password')
             #passwd.bind('<FocusIn>', lambda event: on_enter(event, "passwd"))
@@ -109,14 +107,12 @@ class RegistryFrame(Frame):
                 elif passwd.get() == "" or passwd.get() == "Password":
                     tkinter.messagebox.showerror(title="Lỗi đăng nhập",message="Nhập mật khẩu !!")
                 else:
-                    funcPage()
-                    #result = []
-                    #result = peer.loginClient(user.get(),passwd.get())
+                    result = []
+                    result = client.loginService(user.get(),passwd.get())
                     ## move to OnlineUserPage
-                    #if result==True:
-                    #    self.close = True
-                    #    usern = user.get()
-                    #    ListPage(usern)
+                    if result==True:
+                        self.close = True
+                        funcPage()
                     #else:
                     #    tkinter.messagebox.showerror(title="Lỗi đăng nhập",message="Tài khoản hoặc mật khẩu không đúng!")
         
