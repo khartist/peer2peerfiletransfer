@@ -83,10 +83,9 @@ def getFileList():
 def getIPList():
     cursor.execute("SELECT ip FROM FILES")
     results = cursor.fetchall()
-    ip_set = set()
-    for result in results:
-        ip_set.add(result)
-    unique_ip = list(ip_set)
+    ip_list = [result[0] for result in results]  # Extract the IP addresses from the tuples
+    unique_ip = list(set(ip_list))  # Remove duplicates using set and convert back to a list
+
     return unique_ip
 
 def getFileFromList(name):
@@ -103,7 +102,7 @@ def createNewFileLog(ip ,name):
     print(f"{ip}'s repo has succesfully registered")
 
 def findFileByIP(ip):
-    cursor.execute("SELECT file FROM FILES WHERE ip = ?", (ip))
+    cursor.execute("SELECT file FROM FILES WHERE ip = ?", (ip,))
     result = cursor.fetchall()
     if result is None:
         print("Cannot find anything bro")
@@ -113,10 +112,16 @@ def findFileByIP(ip):
 
 def discover(ip):
     #goi ham discover tu ben Client, tra ve server, server nhan list nay, sau do chuyen len UI
-    return {'a.txt','b.pdf','c.docx','d.pdf','e.pptx', 'f.txt', 'm.txt', 'xxx.txt', 'lol.exe', 'ciscoPacketTrace.txt', 'yyy.txt'}
+    results = findFileByIP(ip)
+    print(results)
+    return results
 
 def ping(ip):
-    return True
+    ipList = getIPList()
+    #print(ipList)
+    if ip in ipList:
+        return True
+    return False
 
 '''while True:  
     conn, addr = s.accept()

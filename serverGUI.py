@@ -114,16 +114,17 @@ class pingView(Tk):
         text1 = Label(pingFrame, text = "Destination's IP").grid(row=1, column=0)
         introText = Label(pingFrame, text = "Use this function to check if an IP is online").grid(row=0)
 
-        des = StringVar()
-        box = Entry(pingFrame, textvariable=des).grid(row=1, column =1)
-        
+        self.des = StringVar()
+        box = Entry(pingFrame, textvariable=self.des)
+        box.grid(row=1, column =1)
         buttonframe = Frame(self)
         buttonframe.pack(side="bottom")
-        button1=Button(buttonframe, border=0, width=20, pady=5, bg='#FFF9E3', fg='#1B365C', text="Execute", command=lambda: respond())
+        button1=Button(buttonframe, border=0, width=20, pady=5, bg='#FFF9E3', fg='#1B365C', text="Execute", command=lambda: respond(box.get()))
         button1.pack()
 
-        def respond():
-            state = server.ping(des)
+        def respond(var):
+            print(var)
+            state = server.ping(var)
             if(state == True):
                 respondFrame = Frame(self)
                 respondFrame.pack(side="top")
@@ -169,25 +170,26 @@ class discoverView(Tk):
         text1 = Label(pingFrame, text = "Destination's IP").grid(row=1, column=0)
         introText = Label(pingFrame, text = "Use this function to get file list from an IP").grid(row=0)
 
-        des = StringVar()
-        box = Entry(pingFrame, textvariable=des).grid(row=1, column =1)
+        self.des = StringVar()
+        box = Entry(pingFrame, textvariable=self.des)
+        box.grid(row=1, column =1)
         
         buttonframe = Frame(self)
         buttonframe.pack(side="bottom")
-        button1=Button(buttonframe, border=0, width=20, pady=5, bg='#FFF9E3', fg='#1B365C', text="Submit", command=lambda: fileListView())
+        button1=Button(buttonframe, border=0, width=20, pady=5, bg='#FFF9E3', fg='#1B365C', text="Submit", command=lambda: fileListView(box.get()))
         #button1.grid(row=0, column=0, padx=5, pady=5)
         button1.pack()
         
 
-        def fileListView():
+        def fileListView(var):
             #discoverList = server.discover(des)
             #discoverList = DISCOVER_TEST_LIST
             listFrame = Frame(self, bg="#FFE3FD")
             label = Label(listFrame, text="File list")
             listbox = Listbox(listFrame, height=10, width=15, bg="#E3FFFC", activestyle='dotbox', font="Helvetica", fg="#050505")
             listbox.delete(0, "end")  # Clear the listbox
-            #FILE_LIST = server.discover(des)
-            FILE_LIST = {'a.txt','b.pdf','c.docx','d.pdf','e.pptx', 'f.txt', 'm.txt', 'xxx.txt', 'lol.exe', 'ciscoPacketTrace.txt', 'yyy.txt'}
+            FILE_LIST = server.discover(var)
+            #FILE_LIST = {'a.txt','b.pdf','c.docx','d.pdf','e.pptx', 'f.txt', 'm.txt', 'xxx.txt', 'lol.exe', 'ciscoPacketTrace.txt', 'yyy.txt'}
             for item in FILE_LIST: 
                 listbox.insert("end", item)
             #self.after(15000, update_listbox)
