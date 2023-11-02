@@ -7,7 +7,7 @@ import server
 class FirstPage(Tk):
     def __init__(self):
         super().__init__()
-        self.configure(bg="#fff")
+        self.configure(bg="#FFE3FD")
         self.title('File Transfer Admin')
         self.geometry("480x480")
 
@@ -18,7 +18,7 @@ class FirstPage(Tk):
         self.buttonframe = Frame(self)
         self.buttonframe.pack(side="bottom")
 
-        self.button1=Button(self.buttonframe,border=0, width=20, pady=5, bg='#FECEFC', fg='#1B365C', text="Click here", command=lambda: self.change_frame("listPage"))
+        self.button1=Button(self.buttonframe,border=0, width=20, pady=5, bg='#FFF9E3', fg='#1B365C', text="Click here", command=lambda: self.change_frame("listPage"))
         self.button1.grid(row=0, column=0, padx=5, pady=5)
 
         self.mainloop()
@@ -42,13 +42,13 @@ class FirstPage(Tk):
 class ListPage(Tk):
     def __init__(self):
         super().__init__() 
-        self.configure(bg="#fff")
+        self.configure(bg="#FFE3FD")
         self.title('File Transfer Admin')
         self.geometry("700x400")
         
-        listFrame = Frame(self, bg="#fff")
+        listFrame = Frame(self, bg="#FFE3FD")
         label = Label(listFrame, text="File list")
-        listbox = Listbox(listFrame, height=10, width=15, bg="grey", activestyle='dotbox', font="Helvetica", fg="yellow")
+        listbox = Listbox(listFrame, height=10, width=15, bg="#E3FFFC", activestyle='dotbox', font="Helvetica", fg="#050505")
 
         # Function to update the listbox contents
         def update_listbox():
@@ -76,13 +76,13 @@ class ListPage(Tk):
 
         buttonframe = Frame(self)
         buttonframe.pack(side="bottom")
-        button1 = Button(buttonframe, border=0, width=20, pady=5, bg='#FECEFC', fg='#1B365C', text="Ping", command=lambda: self.change_frame("pingView"))
+        button1 = Button(buttonframe, border=0, width=20, pady=5, bg='#FFF9E3', fg='#1B365C', text="Ping", command=lambda: self.change_frame("pingView"))
         button1.grid(row=0, column=0, padx=5, pady=5)
-        button2 = Button(buttonframe, border=0, width=20, pady=5, bg='#FECEFC', fg='#1B365C', text="Discover", command=lambda: self.change_frame("discoverView"))
+        button2 = Button(buttonframe, border=0, width=20, pady=5, bg='#FFF9E3', fg='#1B365C', text="Discover", command=lambda: self.change_frame("discoverView"))
         button2.grid(row=0, column=1, padx=5, pady=5)
-        button3 = Button(buttonframe, border=0, width=20, pady=5, bg='#FECEFC', fg='#1B365C', text="Online IP List", command=lambda: self.change_frame("onlineView"))
+        button3 = Button(buttonframe, border=0, width=20, pady=5, bg='#FFF9E3', fg='#1B365C', text="Online IP List", command=lambda: self.change_frame("onlineView"))
         button3.grid(row=1, column=0, padx=5, pady=5)
-        button4 = Button(buttonframe, border=0, width=20, pady=5, bg='#FECEFC', fg='#1B365C', text="Quit", command=lambda: self.change_frame("quit"))
+        button4 = Button(buttonframe, border=0, width=20, pady=5, bg='#FFF9E3', fg='#1B365C', text="Quit", command=lambda: self.change_frame("quit"))
         button4.grid(row=1, column=1, padx=5, pady=5)
 
         self.mainloop()
@@ -105,11 +105,11 @@ class ListPage(Tk):
 class pingView(Tk):
     def __init__(self):
         super().__init__()
-        self.configure(bg="#fff")
+        self.configure(bg="#FFE3FD")
         self.title('Ping')
         self.geometry("600x200")
 
-        pingFrame = Frame(self, background="#fff")
+        pingFrame = Frame(self, background="#FFE3FD")
         pingFrame.pack(side="top")
         text1 = Label(pingFrame, text = "Destination's IP").grid(row=1, column=0)
         introText = Label(pingFrame, text = "Use this function to check if an IP is online").grid(row=0)
@@ -119,7 +119,7 @@ class pingView(Tk):
         
         buttonframe = Frame(self)
         buttonframe.pack(side="bottom")
-        button1=Button(buttonframe, border=0, width=20, pady=5, bg='#FECEFC', fg='#1B365C', text="Execute", command=lambda: respond())
+        button1=Button(buttonframe, border=0, width=20, pady=5, bg='#FFF9E3', fg='#1B365C', text="Execute", command=lambda: respond())
         button1.pack()
 
         def respond():
@@ -131,7 +131,7 @@ class pingView(Tk):
                 label.pack()
                 buttonframe = Frame(self)
                 buttonframe.pack(side="bottom")
-                button1=Button(buttonframe, border=0, width=20, pady=5, bg='#FECEFC', fg='#1B365C', text="Quit", command=lambda: quit())
+                button1=Button(buttonframe, border=0, width=20, pady=5, bg='#FFF9E3', fg='#1B365C', text="Quit", command=lambda: quit())
                 button1.pack()
                 buttonframe.pack()
 
@@ -144,7 +144,7 @@ class pingView(Tk):
                 label.pack()
                 buttonframe = Frame(self)
                 buttonframe.pack(side="bottom")
-                button1=Button(buttonframe, border=0, width=20, pady=5, bg='#FECEFC', fg='#1B365C', text="Quit", command=lambda: quit())
+                button1=Button(buttonframe, border=0, width=20, pady=5, bg='#FFF9E3', fg='#1B365C', text="Quit", command=lambda: quit())
                 button1.pack()
                 buttonframe.pack()
                 print("NO")
@@ -160,11 +160,11 @@ class pingView(Tk):
 class discoverView(Tk):
     def __init__(self):
         super().__init__()
-        self.configure(bg="#fff")
+        self.configure(bg="#FFE3FD")
         self.title('Discover')
         self.geometry("550x300")
 
-        pingFrame = Frame(self, background="#fff")
+        pingFrame = Frame(self, background="#FFE3FD")
         pingFrame.pack(side="top")
         text1 = Label(pingFrame, text = "Destination's IP").grid(row=1, column=0)
         introText = Label(pingFrame, text = "Use this function to get file list from an IP").grid(row=0)
@@ -174,7 +174,7 @@ class discoverView(Tk):
         
         buttonframe = Frame(self)
         buttonframe.pack(side="bottom")
-        button1=Button(buttonframe, border=0, width=20, pady=5, bg='#FECEFC', fg='#1B365C', text="Submit", command=lambda: fileListView())
+        button1=Button(buttonframe, border=0, width=20, pady=5, bg='#FFF9E3', fg='#1B365C', text="Submit", command=lambda: fileListView())
         #button1.grid(row=0, column=0, padx=5, pady=5)
         button1.pack()
         
@@ -182,9 +182,9 @@ class discoverView(Tk):
         def fileListView():
             #discoverList = server.discover(des)
             #discoverList = DISCOVER_TEST_LIST
-            listFrame = Frame(self, bg="#fff")
+            listFrame = Frame(self, bg="#FFE3FD")
             label = Label(listFrame, text="File list")
-            listbox = Listbox(listFrame, height=10, width=15, bg="grey", activestyle='dotbox', font="Helvetica", fg="yellow")
+            listbox = Listbox(listFrame, height=10, width=15, bg="#E3FFFC", activestyle='dotbox', font="Helvetica", fg="#050505")
             listbox.delete(0, "end")  # Clear the listbox
             #FILE_LIST = server.discover(des)
             FILE_LIST = {'a.txt','b.pdf','c.docx','d.pdf','e.pptx', 'f.txt', 'm.txt', 'xxx.txt', 'lol.exe', 'ciscoPacketTrace.txt', 'yyy.txt'}
@@ -198,7 +198,7 @@ class discoverView(Tk):
             print("Update view")
             buttonframe = Frame(self)
             buttonframe.pack(side="bottom")
-            button1=Button(buttonframe, border=0, width=20, pady=5, bg='#FECEFC', fg='#1B365C', text="Quit", command=lambda: quit())
+            button1=Button(buttonframe, border=0, width=20, pady=5, bg='#FFF9E3', fg='#1B365C', text="Quit", command=lambda: quit())
             button1.pack()
             listFrame.pack()
             listbox.pack()
@@ -215,13 +215,13 @@ class discoverView(Tk):
 class onlineView(Tk):
     def __init__(self):
         super().__init__()
-        self.configure(bg="#fff")
+        self.configure(bg="#FFE3FD")
         self.title('IP list')
         self.geometry("400x400")
 
-        listFrame = Frame(self, bg="black")
+        listFrame = Frame(self, bg="#E3FFFC")
         label = Label(listFrame, text="IP list")
-        listbox = Listbox(listFrame, height=10, width=15, bg="grey", activestyle='dotbox', font="Helvetica", fg="yellow")
+        listbox = Listbox(listFrame, height=10, width=15,bg="#E3FFFC", activestyle='dotbox', font="Helvetica", fg="#050505")
 
         # Function to update the listbox contents
         def update_listbox():
@@ -248,7 +248,7 @@ class onlineView(Tk):
 
         buttonframe = Frame(self)
         buttonframe.pack(side="bottom")
-        button1=Button(buttonframe, border=0, width=20, pady=5, bg='#FECEFC', fg='#1B365C', text="Quit", command=lambda: quit())
+        button1=Button(buttonframe, border=0, width=20, pady=5, bg='#FFF9E3', fg='#1B365C', text="Quit", command=lambda: quit())
         #button1.grid(row=0, column=0, padx=5, pady=5)
         button1.pack()
 
