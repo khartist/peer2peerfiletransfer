@@ -6,8 +6,8 @@ connection = sqlite3.connect('users.db')
 
 cursor = connection.cursor()
 
-command1 = """CREATE TABLE IF NOT EXISTS USERS(username text, password text)"""
-command2 = """CREATE TABLE IF NOT EXISTS FILES(ip text, file text)"""
+command1 = """CREATE TABLE IF NOT EXISTS USERS(username text PRIMARY KEY, password text)"""
+command2 = """CREATE TABLE IF NOT EXISTS FILES(ip text PRIMARY KEY, file text)"""
 
 cursor.execute(command1)
 cursor.execute(command2)
