@@ -44,43 +44,47 @@ class ListPage(Tk):
         super().__init__() 
         self.configure(bg="#fff")
         self.title('File Transfer Admin')
-        self.geometry("700x250")
+        self.geometry("700x400")
         
         listFrame = Frame(self, bg="#fff")
-        label = Label(listFrame, text = "File list")
-        listbox = Listbox(listFrame, height = 10, 
-                  width = 15, 
-                  bg = "grey",
-                  activestyle = 'dotbox', 
-                  font = "Helvetica",
-                  fg = "yellow")
-        FILE_LIST = server.getFileList()
-        for item in FILE_LIST: 
-            ip = item[0]
-            file = item[1]
-            display_text = f"{ip}:{file}"
-            listbox.insert("end", display_text)
+        label = Label(listFrame, text="File list")
+        listbox = Listbox(listFrame, height=10, width=15, bg="grey", activestyle='dotbox', font="Helvetica", fg="yellow")
 
-        #scrollbar
-        scrollbar =Scrollbar(listFrame, orient= 'vertical')
-        scrollbar.pack(side= RIGHT, fill= BOTH)
-        listbox.config(yscrollcommand= scrollbar.set)
-        #Configure the scrollbar
-        scrollbar.config(command= listbox.yview)
-        
-        listFrame.pack(side= "top")
+        # Function to update the listbox contents
+        def update_listbox():
+            listbox.delete(0, "end")  # Clear the listbox
+            FILE_LIST = server.getFileList()
+            for item in FILE_LIST: 
+                ip = item[0]
+                file = item[1]
+                display_text = f"{ip}: {file}"
+                listbox.insert("end", display_text)
+            self.after(15000, update_listbox)
+            print("Update view")  # Schedule the next update after 5 seconds
+
+        update_listbox()  # Initial call to populate the listbox
+
+        # Scrollbar
+        scrollbar = Scrollbar(listFrame, orient='vertical')
+        scrollbar.pack(side="right", fill="y")
+        listbox.config(yscrollcommand=scrollbar.set)
+        scrollbar.config(command=listbox.yview)
+
+        listFrame.pack(side="top")
         label.pack()
+        listbox.pack()
 
         buttonframe = Frame(self)
         buttonframe.pack(side="bottom")
-        button1=Button(buttonframe, border=0, width=20, pady=5, bg='#FECEFC', fg='#1B365C', text="Ping", command=lambda: self.change_frame("pingView"))
+        button1 = Button(buttonframe, border=0, width=20, pady=5, bg='#FECEFC', fg='#1B365C', text="Ping", command=lambda: self.change_frame("pingView"))
         button1.grid(row=0, column=0, padx=5, pady=5)
-        button2=Button(buttonframe, border=0, width=20, pady=5, bg='#FECEFC', fg='#1B365C', text="Discover", command=lambda: self.change_frame("discoverView"))
+        button2 = Button(buttonframe, border=0, width=20, pady=5, bg='#FECEFC', fg='#1B365C', text="Discover", command=lambda: self.change_frame("discoverView"))
         button2.grid(row=0, column=1, padx=5, pady=5)
-        button3=Button(buttonframe, border=0, width=20, pady=5, bg='#FECEFC', fg='#1B365C', text="IP List", command=lambda: self.change_frame("listIPview"))
-        button3.grid(row=0, column=2, padx=5, pady=5)
+        button3 = Button(buttonframe, border=0, width=20, pady=5, bg='#FECEFC', fg='#1B365C', text="Online IP List", command=lambda: self.change_frame("onlineView"))
+        button3.grid(row=1, column=0, padx=5, pady=5)
+        button4 = Button(buttonframe, border=0, width=20, pady=5, bg='#FECEFC', fg='#1B365C', text="Quit", command=lambda: self.change_frame("quit"))
+        button4.grid(row=1, column=1, padx=5, pady=5)
 
-        listbox.pack()
         self.mainloop()
 
     def change_frame(self,frame_name):
@@ -90,86 +94,170 @@ class ListPage(Tk):
         elif frame_name == "discoverView":
             discoverView()
             self.close()
-        elif frame_name == "listIPview":
-            listIPview()
+        elif frame_name == "onlineView":
+            onlineView()
             self.close()
+        elif frame_name == "quit":
+            self.withdraw()
+            self.destroy()
+            exit()
 
 class pingView(Tk):
     def __init__(self):
         super().__init__()
         self.configure(bg="#fff")
         self.title('Ping')
-        self.geometry("200x200")
+        self.geometry("600x200")
 
         pingFrame = Frame(self, background="#fff")
         pingFrame.pack(side="top")
-        text1 = Label(pingFrame, text = "Destination's IP").grid(row=0, column=0)
+        text1 = Label(pingFrame, text = "Destination's IP").grid(row=1, column=0)
+        introText = Label(pingFrame, text = "Use this function to check if an IP is online").grid(row=0)
 
         des = StringVar()
-        box = Entry(pingFrame, textvariable=des).grid(row=0, column =1)
+        box = Entry(pingFrame, textvariable=des).grid(row=1, column =1)
         
         buttonframe = Frame(self)
         buttonframe.pack(side="bottom")
-        button1=Button(buttonframe, border=0, width=20, pady=5, bg='#FECEFC', fg='#1B365C', text="Submit") #, command=lambda: self.change_frame("pingView"))
+        button1=Button(buttonframe, border=0, width=20, pady=5, bg='#FECEFC', fg='#1B365C', text="Execute", command=lambda: respond())
         button1.pack()
 
+        def respond():
+            state = server.ping(des)
+            if(state == True):
+                respondFrame = Frame(self)
+                respondFrame.pack(side="top")
+                label = Label(respondFrame, text = "this ip is online")
+                label.pack()
+                buttonframe = Frame(self)
+                buttonframe.pack(side="bottom")
+                button1=Button(buttonframe, border=0, width=20, pady=5, bg='#FECEFC', fg='#1B365C', text="Quit", command=lambda: quit())
+                button1.pack()
+                buttonframe.pack()
+
+                print("YES")
+                
+            elif(state == False):
+                respondFrame = Frame(self)
+                respondFrame.pack(side="top")
+                label = Label(respondFrame, text = "this ip is offline")
+                label.pack()
+                buttonframe = Frame(self)
+                buttonframe.pack(side="bottom")
+                button1=Button(buttonframe, border=0, width=20, pady=5, bg='#FECEFC', fg='#1B365C', text="Quit", command=lambda: quit())
+                button1.pack()
+                buttonframe.pack()
+                print("NO")
+            else: 
+                print("Ahuhu can not do anything lmao lmao lmao lmao")
+
+        def quit():
+            self.destroy()
+
         self.mainloop()
+
 
 class discoverView(Tk):
     def __init__(self):
         super().__init__()
         self.configure(bg="#fff")
         self.title('Discover')
-        self.geometry("200x200")
+        self.geometry("550x300")
 
         pingFrame = Frame(self, background="#fff")
         pingFrame.pack(side="top")
-        text1 = Label(pingFrame, text = "Destination's IP").grid(row=0, column=0)
+        text1 = Label(pingFrame, text = "Destination's IP").grid(row=1, column=0)
+        introText = Label(pingFrame, text = "Use this function to get file list from an IP").grid(row=0)
 
         des = StringVar()
-        box = Entry(pingFrame, textvariable=des).grid(row=0, column =1)
+        box = Entry(pingFrame, textvariable=des).grid(row=1, column =1)
         
         buttonframe = Frame(self)
         buttonframe.pack(side="bottom")
-        button1=Button(buttonframe, border=0, width=20, pady=5, bg='#FECEFC', fg='#1B365C', text="Submit") #, command=lambda: self.change_frame("pingView"))
+        button1=Button(buttonframe, border=0, width=20, pady=5, bg='#FECEFC', fg='#1B365C', text="Submit", command=lambda: fileListView())
+        #button1.grid(row=0, column=0, padx=5, pady=5)
         button1.pack()
+        
+
+        def fileListView():
+            #discoverList = server.discover(des)
+            #discoverList = DISCOVER_TEST_LIST
+            listFrame = Frame(self, bg="#fff")
+            label = Label(listFrame, text="File list")
+            listbox = Listbox(listFrame, height=10, width=15, bg="grey", activestyle='dotbox', font="Helvetica", fg="yellow")
+            listbox.delete(0, "end")  # Clear the listbox
+            #FILE_LIST = server.discover(des)
+            FILE_LIST = {'a.txt','b.pdf','c.docx','d.pdf','e.pptx', 'f.txt', 'm.txt', 'xxx.txt', 'lol.exe', 'ciscoPacketTrace.txt', 'yyy.txt'}
+            for item in FILE_LIST: 
+                listbox.insert("end", item)
+            #self.after(15000, update_listbox)
+            scrollbar = Scrollbar(listFrame, orient='vertical')
+            scrollbar.pack(side="right", fill="y")
+            listbox.config(yscrollcommand=scrollbar.set)
+            scrollbar.config(command=listbox.yview)
+            print("Update view")
+            buttonframe = Frame(self)
+            buttonframe.pack(side="bottom")
+            button1=Button(buttonframe, border=0, width=20, pady=5, bg='#FECEFC', fg='#1B365C', text="Quit", command=lambda: quit())
+            button1.pack()
+            listFrame.pack()
+            listbox.pack()
+            label.pack()
+
+        def quit():
+            self.destroy()
 
         self.mainloop()
 
-IP_LIST = {'1.1.1.1','2.2.2.2','3.3.3.3','4.4.4.4','5.5.5.5', '6.6.6.6', '7.7.7.7', '8.8.8.8', '9.9.9.9'}
-class listIPview(Tk):
+
+
+#IP_LIST = {'1.1.1.1','2.2.2.2','3.3.3.3','4.4.4.4','5.5.5.5', '6.6.6.6', '7.7.7.7', '8.8.8.8', '9.9.9.9'}
+class onlineView(Tk):
     def __init__(self):
         super().__init__()
         self.configure(bg="#fff")
         self.title('IP list')
-        self.geometry("200x200")
-
+        self.geometry("400x400")
 
         listFrame = Frame(self, bg="black")
-        label = Label(listFrame, text = "IP list")
-        listbox = Listbox(listFrame, height = 10, 
-                  width = 15, 
-                  bg = "grey",
-                  activestyle = 'dotbox', 
-                  font = "Helvetica",
-                  fg = "yellow")
-        i = 1
-        for item in IP_LIST: 
-            listbox.insert(i, item)
-            i = i + 1
+        label = Label(listFrame, text="IP list")
+        listbox = Listbox(listFrame, height=10, width=15, bg="grey", activestyle='dotbox', font="Helvetica", fg="yellow")
 
-        #scrollbar
-        scrollbar =Scrollbar(listFrame, orient= 'vertical')
-        scrollbar.pack(side= RIGHT, fill= BOTH)
-        listbox.config(yscrollcommand= scrollbar.set)
-        #Configure the scrollbar
-        scrollbar.config(command= listbox.yview)
-        
+        # Function to update the listbox contents
+        def update_listbox():
+            listbox.delete(0, "end")  # Clear the listbox
+            i = 1
+            IP_LIST = server.getIPList()
+            for item in IP_LIST:
+                listbox.insert(i, item)
+                i = i + 1
+            self.after(1000, update_listbox) # Schedule the next update after 1 second
+            print("1 second has pass") 
+
+        update_listbox()  # Initial call to populate the listbox
+
+        # Scrollbar
+        scrollbar = Scrollbar(listFrame, orient='vertical')
+        scrollbar.pack(side="right", fill="y")
+        listbox.config(yscrollcommand=scrollbar.set)
+        scrollbar.config(command=listbox.yview)
+
         listFrame.pack(side="top")
         label.pack()
         listbox.pack()
 
+        buttonframe = Frame(self)
+        buttonframe.pack(side="bottom")
+        button1=Button(buttonframe, border=0, width=20, pady=5, bg='#FECEFC', fg='#1B365C', text="Quit", command=lambda: quit())
+        #button1.grid(row=0, column=0, padx=5, pady=5)
+        button1.pack()
+
+        def quit():
+            self.destroy()
+
         self.mainloop()
+    
+
 
 if __name__ == "__main__":
     root = FirstPage()
