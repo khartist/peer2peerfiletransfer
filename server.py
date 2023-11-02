@@ -80,6 +80,15 @@ def getFileList():
         file_list.append((ip, file))
     return file_list
 
+def getIPList():
+    cursor.execute("SELECT ip FROM FILES")
+    results = cursor.fetchall()
+    ip_set = set()
+    for result in results:
+        ip_set.add(result)
+    unique_ip = list(ip_set)
+    return unique_ip
+
 def getFileFromList(name):
     results = getFileList()
     for result in results:
@@ -102,6 +111,12 @@ def findFileByIP(ip):
     print(f"Oh there is something in this address {ip}\n")
     return result
 
+def discover(ip):
+    #goi ham discover tu ben Client, tra ve server, server nhan list nay, sau do chuyen len UI
+    return {'a.txt','b.pdf','c.docx','d.pdf','e.pptx', 'f.txt', 'm.txt', 'xxx.txt', 'lol.exe', 'ciscoPacketTrace.txt', 'yyy.txt'}
+
+def ping(ip):
+    return True
 
 '''while True:  
     conn, addr = s.accept()
