@@ -7,7 +7,7 @@ import server
 class FirstPage(Tk):
     def __init__(self):
         super().__init__()
-        self.configure(bg="#FFE3FD")
+        self.configure(bg="#fff")
         self.title('File Transfer Admin')
         self.geometry("480x480")
 
@@ -42,11 +42,11 @@ class FirstPage(Tk):
 class ListPage(Tk):
     def __init__(self):
         super().__init__() 
-        self.configure(bg="#FFE3FD")
+        self.configure(bg="#fff")
         self.title('File Transfer Admin')
         self.geometry("700x400")
         
-        listFrame = Frame(self, bg="#FFE3FD")
+        listFrame = Frame(self, bg="#fff")
         label = Label(listFrame, text="File list")
         listbox = Listbox(listFrame, height=10, width=15, bg="#E3FFFC", activestyle='dotbox', font="Helvetica", fg="#050505")
 
@@ -105,11 +105,11 @@ class ListPage(Tk):
 class pingView(Tk):
     def __init__(self):
         super().__init__()
-        self.configure(bg="#FFE3FD")
+        self.configure(bg="#fff")
         self.title('Ping')
         self.geometry("600x200")
 
-        pingFrame = Frame(self, background="#FFE3FD")
+        pingFrame = Frame(self, background="#fff")
         pingFrame.pack(side="top")
         text1 = Label(pingFrame, text = "Destination's IP").grid(row=1, column=0)
         introText = Label(pingFrame, text = "Use this function to check if an IP is online").grid(row=0)
@@ -161,11 +161,11 @@ class pingView(Tk):
 class discoverView(Tk):
     def __init__(self):
         super().__init__()
-        self.configure(bg="#FFE3FD")
+        self.configure(bg="#fff")
         self.title('Discover')
         self.geometry("550x300")
 
-        pingFrame = Frame(self, background="#FFE3FD")
+        pingFrame = Frame(self, background="#fff")
         pingFrame.pack(side="top")
         text1 = Label(pingFrame, text = "Destination's IP").grid(row=1, column=0)
         introText = Label(pingFrame, text = "Use this function to get file list from an IP").grid(row=0)
@@ -184,7 +184,7 @@ class discoverView(Tk):
         def fileListView(var):
             #discoverList = server.discover(des)
             #discoverList = DISCOVER_TEST_LIST
-            listFrame = Frame(self, bg="#FFE3FD")
+            listFrame = Frame(self, bg="#fff")
             label = Label(listFrame, text="File list")
             listbox = Listbox(listFrame, height=10, width=15, bg="#E3FFFC", activestyle='dotbox', font="Helvetica", fg="#050505")
             listbox.delete(0, "end")  # Clear the listbox
@@ -217,7 +217,7 @@ class discoverView(Tk):
 class onlineView(Tk):
     def __init__(self):
         super().__init__()
-        self.configure(bg="#FFE3FD")
+        self.configure(bg="#fff")
         self.title('IP list')
         self.geometry("400x400")
 
