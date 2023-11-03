@@ -1,6 +1,11 @@
 import tkinter as tk
 from tkinter import messagebox, ttk
 import re
+import socket
+import json
+SERVER_IP = '127.0.0.1'  # IP của máy chủ
+SERVER_PORT = 5050  # Port của máy chủ
+CLIENT_IP = socket.gethostbyname(socket.gethostname())  # Địa chỉ IP của client
 
 class App:
     def __init__(self, root):
@@ -25,18 +30,31 @@ class App:
 
         ttk.Button(self.root, text="Sign In", command=self.sign_in).pack(pady=20)
         ttk.Button(self.root, text="Go to Register", command=self.sign_up_page).pack(pady=5)
-
+#=======================================================================================================
     def sign_in(self):
-                # query với server để có thể đăng nhập tk khác, dưới là tk mặc định
-        username = "BrianDuong"
-        password = "Quan@2802"
-        # Nav tới trang chủ
-        if self.username_entry.get() == username and self.password_entry.get() == password:
+        response = self.send_login_data_to_server(self.username_entry.get(), self.password_entry.get())
+        if response == "200":
             messagebox.showinfo("Notification", "Sign In successfully!")
             self.home_page()
-        else:
+        else: 
             messagebox.showerror("Error", "Incorrect username or password!")
 
+    def send_login_data_to_server(self, username, password):
+        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        client_socket.connect((SERVER_IP, SERVER_PORT))
+    
+        data_to_send = {
+        "request_type": "login",
+        "username": username,
+        "password": password
+        }
+
+        client_socket.send(json.dumps(data_to_send).encode())
+        response = client_socket.recv(1024).decode()
+        client_socket.close()
+        return response
+
+#=======================================================================================================
     def sign_up_page(self):
         self.clear_window()
         self.root.title("Sign In/Sgin Up")
@@ -57,7 +75,22 @@ class App:
 
         ttk.Button(self.root, text="Register", command=self.sign_up).pack(pady=20)
         ttk.Button(self.root, text="Go to Sign In", command=self.sign_in_page).pack(pady=5)
-
+#=======================================================================================================
+    def send_registration_data_to_server(self, username, password, ip, port):
+        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        client_socket.connect((SERVER_IP, SERVER_PORT))
+    
+        data_to_send = {
+        "request_type": "registration",
+        "username": username,
+        "password": password,
+        "ip": ip,
+        "port": port
+        }
+        client_socket.send(json.dumps(data_to_send).encode())
+        response = client_socket.recv(1024).decode()
+        client_socket.close()
+        return response
     def sign_up(self):
         username = self.new_username_entry.get()
         password = self.new_password_entry.get()
@@ -74,12 +107,16 @@ class App:
         if password != confirm_password:
             messagebox.showerror("Error", "Password confirmation does not match!")
             return
+        
+        response = self.send_registration_data_to_server(username, password, CLIENT_IP, SERVER_PORT)
 
-        # lưu account info ( implement cái này với server)
-        #...
-        messagebox.showinfo("Notification", "Registered successfully! Please login.")
-        self.sign_in_page()
+        if response == "200":
+            messagebox.showinfo("Notification", "Registered successfully! Please login.")
+            self.sign_in_page()
+        else:
+            messagebox.showerror("Error", response)
 
+#=======================================================================================================
     def home_page(self):
         self.clear_window()
         self.root.title("Home")
