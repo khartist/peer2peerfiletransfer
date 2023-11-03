@@ -95,16 +95,18 @@ def handle_client(client, addr):
                 passwd_length = int(client.recv(HEADER).decode(FORMAT))
                 passwd = client.recv(passwd_length).decode(FORMAT) 
                 record = getAccountByUsername(user)
+                port_in4_length = int(client.recv(HEADER).decode(FORMAT))
+                port_in4 = client.recv(port_in4_length).decode(FORMAT)
+                port_for_server = port_in4
                 if record != []:
                     sendMessage(client, "Account has been used - 0")    
                 else:
-                    port_in4_length = int(client.recv(HEADER).decode(FORMAT))
-                    port_in4 = client.recv(port_in4_length).decode(FORMAT)
-                    port_for_server = port_in4
                     try:
                         insertUser(user,passwd,ip,port,port_for_server)
+                        sendMessage(client, "200")
                         sendMessage(client, "Account created successfully - 1")
                     except:
+                        sendMessage(client, "404")
                         sendMessage(client, "Error. Try again...")
 #==========================================LOGIN============================================
             elif message.startswith('login'):
@@ -126,9 +128,11 @@ def handle_client(client, addr):
                 else:
                     try:
                         updateUser(user,passwd,ip,port,1)
+                        sendMessage(client, "200")
                         sendMessage(client, "Kết nối thành công - 1")
                         sendMessage(client, f'Hello {user}! Welcome to our journey')
                     except Exception as e:
+                        sendMessage(client, "404")
                         sendMessage(client, "Lỗi truy vấn. Đang thử lại... - 0")
                         traceback.print_exc()
 #=============================================LOGOUT===============================================
@@ -163,7 +167,8 @@ def handle_client(client, addr):
                 else:
                 # holder_addresses = [addr for addr, files in clients.items() if any(f[1] == fname for f in files)]
                 # response = ', '.join(map(str, holder_addresses))
-                    response = str(record)
+                    record = record[0]
+                    response = str(record[0]) + " " + str(record[1])
                     print(response)
                     sendMessage(client=client, message=response)
     client.close()
@@ -173,6 +178,7 @@ def start_server():
     while True:
         client, addr = server.accept()
         thread = threading.Thread(target=handle_client, args=(client, addr))
+        thread.daemon = True
         thread.start()
         print(f"[ACTIVE CONNECTION] {threading.active_count()-1} /n")
 
@@ -193,7 +199,50 @@ def ping(admin,ip,port):
         except Exception as e:
             print(e)
     return 0
+def ping_em(hostname):
+    admin = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    record = getIpAndPorforServer(hostname)
+    if record == []:
+        print("Tài khoản hoặc mật khẩu không tồn tại - 0")
+        return
+    else:
+        ip,port = record[0][0],record[0][1]
+    connection = ping(admin,ip,port)
+    if connection == 0: 
+        print('Client offline\n')
+        updateUser(user=hostname,ip=ip,port=port,status=0)
+    else: 
+        print('Client online\n')
+        updateUser(user=hostname,ip=ip,port=port,status=1)
+    admin.close()
 
+def discover(hostname):
+    admin = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    record = getIpAndPorforServer(hostname)
+    if record == []:
+        print("Tài khoản hoặc mật khẩu không tồn tại - 0")
+        return
+    else:
+        ip,port = record[0][0],record[0][1]
+    connection = ping(admin,ip,port)
+    if connection == 0: 
+        print('Client offline\n')
+        updateUser(user=hostname,ip=ip,port=port,status=0)
+    elif connection == 1: 
+        print('Client online\n')
+        updateUser(user=hostname,ip=ip,port=port,status=1)
+        discover = 'discover'.encode(FORMAT)
+        cmd_length = len(discover)
+        senddiscover_length = str(cmd_length).encode(FORMAT)
+        senddiscover_length += b' ' * (HEADER - len(discover))
+        
+        admin.send(senddiscover_length)
+        admin.send(discover)
+        discover_length = int(admin.recv(HEADER).decode(FORMAT))
+        discover_data = discover.recv(discover_length).decode(FORMAT)
+        print(discover_data)
+    else: print('Invalid command! Please input ip and port\n')
+    admin.close()
 
 #----------------------------------------------------------------
 
@@ -209,13 +258,13 @@ if __name__ == "__main__":
         print("Socket error")
     print("Server started.")
     server_thread = threading.Thread(target=start_server)
+    server_thread.daemon = True
     server_thread.start()
 
-
-    ################################################################################################################
-    while True:
+    tnk_baka = True
+    ########################################### ADMIN    #####################################################################
+    while tnk_baka:
         ip,port = "",""
-        admin = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         print("Admin started.")
         cmd = input("Enter command (type 'help' for available commands): ")
         if cmd == 'help':
@@ -228,31 +277,7 @@ if __name__ == "__main__":
             except:
                 print('Invalid command! Please input ip and port\n')
                 continue
-            record = getIpAndPorforServer(hostname)
-            if record == []:
-                print("Tài khoản hoặc mật khẩu không tồn tại - 0")
-                continue
-            else:
-                ip,port = record[0][0],record[0][1]
-            connection = ping(admin,ip,port)
-            if connection == 0: 
-                print('Client offline\n')
-                updateUser(user=hostname,ip=ip,port=port,status=0)
-            elif connection == 1: 
-                print('Client online\n')
-                updateUser(user=hostname,ip=ip,port=port,status=1)
-                discover = 'discover'.encode(FORMAT)
-                cmd_length = len(discover)
-                senddiscover_length = str(cmd_length).encode(FORMAT)
-                senddiscover_length += b' ' * (HEADER - len(discover))
-                
-                admin.send(senddiscover_length)
-                admin.send(discover)
-                discover_length = int(admin.recv(HEADER).decode(FORMAT))
-                discover_data = discover.recv(discover_length).decode(FORMAT)
-                print(discover_data)
-            else: print('Invalid command! Please input ip and port\n')
-            admin.close()
+            discover(hostname)
     #==============================================================================================================================
         elif cmd.startswith('ping'):
             try:
@@ -260,25 +285,10 @@ if __name__ == "__main__":
             except:
                 print('Invalid command! Please input ip and port\n')
                 continue
-            record = getIpAndPorforServer(hostname)
-            if record == []:
-                print("Tài khoản hoặc mật khẩu không tồn tại - 0")
-                continue
-            else:
-                ip,port = record[0][0],record[0][1]
-            connection = ping(admin,ip,port)
-            if connection == 0: 
-                print('Client offline\n')
-                updateUser(user=hostname,ip=ip,port=port,status=0)
-            else: 
-                print('Client online\n')
-                updateUser(user=hostname,ip=ip,port=port,status=1)
-            admin.close()
+            ping_em(hostname)
     #====================================================================================================================
         elif cmd.startswith('exit'):
-            admin.close()
             server.close()
-            break
     #======================================================================================================
         else:
             print("Command not supported")
