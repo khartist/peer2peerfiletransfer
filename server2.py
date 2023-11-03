@@ -231,6 +231,7 @@ if __name__ == "__main__":
             record = getIpAndPorforServer(hostname)
             if record == []:
                 print("Tài khoản hoặc mật khẩu không tồn tại - 0")
+                continue
             else:
                 ip,port = record[0][0],record[0][1]
             connection = ping(admin,ip,port)
@@ -247,7 +248,9 @@ if __name__ == "__main__":
                 
                 admin.send(senddiscover_length)
                 admin.send(discover)
-                
+                discover_length = int(admin.recv(HEADER).decode(FORMAT))
+                discover_data = discover.recv(discover_length).decode(FORMAT)
+                print(discover_data)
             else: print('Invalid command! Please input ip and port\n')
             admin.close()
     #==============================================================================================================================
@@ -260,6 +263,7 @@ if __name__ == "__main__":
             record = getIpAndPorforServer(hostname)
             if record == []:
                 print("Tài khoản hoặc mật khẩu không tồn tại - 0")
+                continue
             else:
                 ip,port = record[0][0],record[0][1]
             connection = ping(admin,ip,port)
