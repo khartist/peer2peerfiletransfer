@@ -95,7 +95,7 @@ def discoverGUI(name):
     SELECT t2.file_name
     FROM account t1
     JOIN file_sharing t2 ON t1.ip = t2.ip
-    WHERE t1.username = '{name} AND t1.status = 1'
+    WHERE t1.username = '{name}' AND t1.status = 1
     """
     mycursor.execute(query)
     results = mycursor.fetchall()
