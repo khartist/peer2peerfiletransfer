@@ -85,7 +85,6 @@ def getIPList():
     results = cursor.fetchall()
     ip_list = [result[0] for result in results]  # Extract the IP addresses from the tuples
     unique_ip = list(set(ip_list))  # Remove duplicates using set and convert back to a list
-
     return unique_ip
 
 def getFileFromList(name):

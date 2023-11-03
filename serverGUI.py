@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter import font
 from tkinter import Image
 import tkinter.messagebox
-import server
+import server2
 
 class FirstPage(Tk):
     def __init__(self):
@@ -53,7 +53,7 @@ class ListPage(Tk):
         # Function to update the listbox contents
         def update_listbox():
             listbox.delete(0, "end")  # Clear the listbox
-            FILE_LIST = server.getFileList()
+            FILE_LIST = server2.getFileList()
             for item in FILE_LIST: 
                 ip = item[0]
                 file = item[1]
@@ -111,8 +111,8 @@ class pingView(Tk):
 
         pingFrame = Frame(self, background="#fff")
         pingFrame.pack(side="top")
-        text1 = Label(pingFrame, text = "Destination's IP").grid(row=1, column=0)
-        introText = Label(pingFrame, text = "Use this function to check if an IP is online").grid(row=0)
+        text1 = Label(pingFrame, text = "Destination's hostname").grid(row=1, column=0)
+        introText = Label(pingFrame, text = "Use this function to check if an hostname is online").grid(row=0)
 
         self.des = StringVar()
         box = Entry(pingFrame, textvariable=self.des)
@@ -124,11 +124,11 @@ class pingView(Tk):
 
         def respond(var):
             print(var)
-            state = server.ping(var)
+            state = server2.pingSearchInDB(var)
             if(state == True):
                 respondFrame = Frame(self)
                 respondFrame.pack(side="top")
-                label = Label(respondFrame, text = "this ip is online")
+                label = Label(respondFrame, text = "this hostname is online")
                 label.pack()
                 buttonframe = Frame(self)
                 buttonframe.pack(side="bottom")
@@ -141,7 +141,7 @@ class pingView(Tk):
             elif(state == False):
                 respondFrame = Frame(self)
                 respondFrame.pack(side="top")
-                label = Label(respondFrame, text = "this ip is offline")
+                label = Label(respondFrame, text = "this hostname is offline")
                 label.pack()
                 buttonframe = Frame(self)
                 buttonframe.pack(side="bottom")
@@ -167,8 +167,8 @@ class discoverView(Tk):
 
         pingFrame = Frame(self, background="#fff")
         pingFrame.pack(side="top")
-        text1 = Label(pingFrame, text = "Destination's IP").grid(row=1, column=0)
-        introText = Label(pingFrame, text = "Use this function to get file list from an IP").grid(row=0)
+        text1 = Label(pingFrame, text = "Destination's hostname").grid(row=1, column=0)
+        introText = Label(pingFrame, text = "Use this function to get file list from an hostname").grid(row=0)
 
         self.des = StringVar()
         box = Entry(pingFrame, textvariable=self.des)
@@ -188,7 +188,7 @@ class discoverView(Tk):
             label = Label(listFrame, text="File list")
             listbox = Listbox(listFrame, height=10, width=15, bg="#E3FFFC", activestyle='dotbox', font="Helvetica", fg="#050505")
             listbox.delete(0, "end")  # Clear the listbox
-            FILE_LIST = server.discover(var)
+            FILE_LIST = server2.discoverGUI(var)
             #FILE_LIST = {'a.txt','b.pdf','c.docx','d.pdf','e.pptx', 'f.txt', 'm.txt', 'xxx.txt', 'lol.exe', 'ciscoPacketTrace.txt', 'yyy.txt'}
             for item in FILE_LIST: 
                 listbox.insert("end", item)
@@ -229,7 +229,7 @@ class onlineView(Tk):
         def update_listbox():
             listbox.delete(0, "end")  # Clear the listbox
             i = 1
-            IP_LIST = server.getIPList()
+            IP_LIST = server2.getIPList()
             for item in IP_LIST:
                 listbox.insert(i, item)
                 i = i + 1
