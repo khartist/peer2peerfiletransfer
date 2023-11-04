@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import messagebox, ttk
 import re
 import socket
-import client2
+import client2 ###neu doi client thi doi o day lai
 import json
 SERVER_IP = '127.0.0.1'  # IP của máy chủ
 SERVER_PORT = 5050  # Port của máy chủ
