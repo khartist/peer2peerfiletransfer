@@ -10,9 +10,13 @@ HEADER = 64
 FORMAT = "utf-8"
 CENTRAL_SERVER_IP = socket.gethostbyname(socket.gethostname())
 CENTRAL_SERVER_PORT = 5050  # Adjust the port as needed
+SUCCESS_MESSAGE = "Kết nối thành công - 1"
 hostname = socket.gethostname()
 file_path = None
 output_folder = None
+local_ip = socket.gethostbyname(hostname)
+local_port = 71
+flag = True
 
 published_files = []
 
@@ -82,16 +86,16 @@ class PeerClient(threading.Thread):
 
 #=======================================================================================================
 #NEW
-def sendMessage(client,message):
+def send_to_server(client,message):
     notify = message.encode(FORMAT)
     notify_lenght = len(notify)
     send_length = str(notify_lenght).encode(FORMAT)
     send_length += b' ' * (HEADER - len(send_length))
     client.send(send_length)
     client.send(notify)
-    
+
 #MORE NEW
-def register_user(username, password, confirm, user_id, port):
+def register_user(username, password, confirm):
     if not re.match("^[a-zA-Z][a-zA-Z0-9]{3,11}$", username):
         print("Error: Invalid username!")
         return
@@ -104,40 +108,40 @@ def register_user(username, password, confirm, user_id, port):
         print("Error: Password confirmation does not match!")
         return
 
-    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_socket.connect((CENTRAL_SERVER_IP, CENTRAL_SERVER_PORT))
 
-    send_to_server(client_socket, json.dumps({"action": "register", "username": username}))
-    send_to_server(client_socket, json.dumps({"password": password}))
-    send_to_server(client_socket, json.dumps({"id": user_id}))
-    send_to_server(client_socket, json.dumps({"port": port}))
-
-    client_socket.close()
+    send_to_server(central_server_socket, 'register')
+    send_to_server(central_server_socket, username)
+    send_to_server(central_server_socket, password)
+    send_to_server(central_server_socket, str(local_port))
 #NEW
 def login_user(username, password):
-    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_socket.connect((CENTRAL_SERVER_IP, CENTRAL_SERVER_PORT))
 
-    send_to_server(client_socket, json.dumps({"action": "register", "username": username}))
-    send_to_server(client_socket, json.dumps({"password": password}))
+    send_to_server(central_server_socket, 'login')
+    send_to_server(central_server_socket, username)
+    send_to_server(central_server_socket, password)
+    send_to_server(central_server_socket, str(local_port))
 
 #=======================================================================================================
 
 def reponse():
+    global flag
     while True:
             msg_length = central_server_socket.recv(HEADER).decode(FORMAT)
             if msg_length:
                 msg_length = int(msg_length)
                 message = central_server_socket.recv(msg_length).decode(FORMAT)
                 print("Server says:", message)
-                try: 
-                    ip,port = message.split()
-                    command = user_input.split()
-                    peer_client = PeerClient(1,ip,int(port),command[1])
-                    peer_client.start()
-                    peer_client.join()
-                except:
-                    continue
+                if message == SUCCESS_MESSAGE:
+                    flag = False
+                else:
+                    try: 
+                        ip,port = message.split()
+                        command = user_input.split()
+                        peer_client = PeerClient(1,ip,int(port),command[1])
+                        peer_client.start()
+                        peer_client.join()
+                    except:
+                        continue
             if not message:
                 break  # Connection closed
                 # Handle received data from the central server
@@ -170,8 +174,7 @@ def fetch(msg):
 def P2P():
     # Input your local IP and port (your address)
 #-------------------------------------------------------CLient Server side socket-----------------------------------------#
-    local_ip = socket.gethostbyname(hostname)
-    local_port = 71
+
 
     # Specify your peer's name
     peer_name = "YourPeerName"
@@ -221,31 +224,33 @@ central_server_thread.start()
 
 central_server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 central_server_socket.connect((CENTRAL_SERVER_IP, CENTRAL_SERVER_PORT))
+
 central_server_response_thread = threading.Thread(target=reponse)
 central_server_response_thread.daemon = True
 central_server_response_thread.start()
 
 if __name__ == "__main__":
 #--------------------------------------------------------Login Phase------------------------------------------------------#
-    user_input = input("Enter your command (login/register): ").lower()
-    if user_input == "login":
-        username = input("Enter username: ")
-        password = input("Enter password: ")
-        login_user(username, password)
-    elif user_input == "register":
-        username = input("Enter username: ")
-        password = input("Enter password: ")
-        confirm = input("Confirm password: ")
-        user_id = input("Enter ID: ")
-        port = input("Enter port: ")
-        register_user(username, password, confirm, user_id, port)
+    while flag:
+        user_input = input("Enter your command (login/register): ").lower()
+        if user_input == "login":
+            username = input("Enter username: ")
+            password = input("Enter password: ")
+            login_user(username, password)
+        elif user_input == "register":
+            username = input("Enter username: ")
+            password = input("Enter password: ")
+            confirm = input("Confirm password: ")
+            register_user(username, password, confirm)
+        time.sleep(10)
+
     file_path = input("Enter your path to folder you want to send file:")
     output_folder = input("Enter your path to folder you want to get file:")
 #------------------------------------------------------------//-----------------------------------------------------------#
     while True:
-        time.sleep(1)
         user_input = input("Enter your command: ")
         if user_input.startswith('publish'):
             publish(user_input)
         elif user_input.startswith('fetch'):
             fetch(user_input)
+        time.sleep(2)
