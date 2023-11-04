@@ -46,8 +46,8 @@ def getAccountByUsernameAndPassword(user,passwd):
     mycursor.execute(f"""SELECT * FROM account WHERE username='{user}' AND password='{passwd}'""")
     records = mycursor.fetchall()
     return records
-def updateUser(user,passwd,ip,port,status):
-    mycursor.execute(f"""UPDATE 'account' SET status={status},ip='{ip}',port='{port}' WHERE username='{user}'""")
+def updateUser(user,ip,port,status):
+    mycursor.execute(f"""UPDATE account SET status={status},ip='{ip}',port='{port}' WHERE username='{user}'""")
     mydb.commit()
 def getIpAndPorforServer(user):
     mycursor.execute(f"""SELECT ip,port_for_server FROM account WHERE username='{user}'""")
@@ -127,7 +127,7 @@ def handle_client(client, addr):
                     sendMessage(client, "Tài khoản hoặc mật khẩu không tồn tại - 0")
                 else:
                     try:
-                        updateUser(user,passwd,ip,port,1)
+                        updateUser(user,ip,port,1)
                         sendMessage(client, "200")
                         sendMessage(client, "Kết nối thành công - 1")
                         sendMessage(client, f'Hello {user}! Welcome to our journey')
@@ -139,7 +139,7 @@ def handle_client(client, addr):
             elif message.startswith('logout'):
                 ip = addr[0]
                 _, user = message.split()
-                updateUser(user,passwd,ip,port,0)      
+                updateUser(user,ip,port,0)      
 #=====================================================================================================                       
             elif message.startswith('publish'):
                 _, lname, fname = message.split()
