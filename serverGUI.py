@@ -59,10 +59,15 @@ class ListPage(Tk):
                 file = item[1]
                 display_text = f"{ip}: {file}"
                 listbox.insert("end", display_text)
-            self.after(30000, update_listbox)
+
+                
             print("Update view")  # Schedule the next update after 5 seconds
 
-        update_listbox()  # Initial call to populate the listbox
+        def schedule_update():
+            update_listbox()
+            self.after(10000, schedule_update)
+
+        schedule_update()  # Initial call to populate the listbox
 
         # Scrollbar
         scrollbar = Scrollbar(listFrame, orient='vertical')
