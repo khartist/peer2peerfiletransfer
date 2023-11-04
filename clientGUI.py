@@ -80,7 +80,7 @@ class RegistryFrame(Frame):
           #  passwd.bind('<FocusOut>', lambda event: on_leave(event, "passwd"))
             #Frame(self, width=295, height=2,bg='black').place(x=95,y=170)
 
-            submit = Button(self, text="Login", border=0, width=40, pady=5, bg='#FECEFC', fg='#1B365C', command=lambda: login_redirect())
+            submit = Button(self, text="Login", border=0, width=40, pady=5, bg='#FECEFC', fg='#1B365C')#, command=lambda: login_redirect())
             submit.place(x=400,y=220)
 
             def on_enter(_,name):
@@ -100,7 +100,7 @@ class RegistryFrame(Frame):
                 else:
                     pass
             
-            def login_redirect():
+            '''def login_redirect():
                 # Validate results
                 if user.get() == "" or user.get() == "Username":
                     tkinter.messagebox.showerror(title="Lỗi đăng nhập",message="Nhập tên tài khoản !!")
@@ -115,7 +115,7 @@ class RegistryFrame(Frame):
                         funcPage()
                     #else:
                     #    tkinter.messagebox.showerror(title="Lỗi đăng nhập",message="Tài khoản hoặc mật khẩu không đúng!")
-        
+        '''
         
         elif self.fname == "register":
             label_0 = Label(self, fg="#57a1f8", bg="#fff", text="Welcome to our service", font=("Microsoft YaHei UI Light",25,"bold"))

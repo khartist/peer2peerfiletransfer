@@ -59,7 +59,7 @@ class ListPage(Tk):
                 file = item[1]
                 display_text = f"{ip}: {file}"
                 listbox.insert("end", display_text)
-            self.after(15000, update_listbox)
+            self.after(30000, update_listbox)
             print("Update view")  # Schedule the next update after 5 seconds
 
         update_listbox()  # Initial call to populate the listbox
@@ -259,7 +259,6 @@ class onlineView(Tk):
 
         self.mainloop()
     
-
 
 if __name__ == "__main__":
     root = FirstPage()

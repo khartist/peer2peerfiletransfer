@@ -1,9 +1,7 @@
 import socket
 import threading
 import mysql.connector
-#import sqlite3
 import traceback
-import serverGUI
 
 password = input("Enter your password of MySQL: ")
 DBName = "PeartoPear"
@@ -28,14 +26,8 @@ try:
 except:
     print('Can\'t connect to MySQL' )
 mycursor = mydb.cursor()
-mycursor.execute(f"""CREATE TABLE IF NOT EXISTS {User_Table1}(username VARCHAR(255) PRIMARY KEY,
-                      password VARCHAR(255),
-                      ip VARCHAR(255) UNIQUE,
-                      port INT , 
-                      port_for_server INT, 
-                      port_for_peer INT,
-                      status INT)""")
-mycursor.execute(f"""CREATE TABLE IF NOT EXISTS {User_Table2}(ip VARCHAR(255), local_name VARCHAR(255),file_name VARCHAR(255) PRIMARY KEY)""")
+mycursor.execute(f"""CREATE TABLE IF NOT EXISTS {User_Table1}(username VARCHAR(255) PRIMARY KEY,password VARCHAR(255),ip VARCHAR(255), port INT, port_for_server INT, status INT)""")
+mycursor.execute(f"""CREATE TABLE IF NOT EXISTS {User_Table2}(ip VARCHAR(255), port_for_peer INT, local_name VARCHAR(255),file_name VARCHAR(255) PRIMARY KEY)""")
 #=========================================================================================================================================================================================
 
 #====================================================================QUERY IN DATABASE====================================================================================================================
@@ -54,86 +46,21 @@ def getAccountByUsernameAndPassword(user,passwd):
     mycursor.execute(f"""SELECT * FROM account WHERE username='{user}' AND password='{passwd}'""")
     records = mycursor.fetchall()
     return records
-def updateUser(user,ip,port,status):
-    mycursor.execute(f"""UPDATE account SET status={status},ip='{ip}',port='{port}' WHERE username='{user}'""")
+def updateUser(user,passwd,ip,port,status):
+    mycursor.execute(f"""UPDATE 'account' SET status={status},ip='{ip}',port='{port}' WHERE username='{user}'""")
     mydb.commit()
 def getIpAndPorforServer(user):
     mycursor.execute(f"""SELECT ip,port_for_server FROM account WHERE username='{user}'""")
     records = mycursor.fetchall()
     return records
-
-def getFileList(): #get file list
-    mycursor.execute("SELECT ip,file_name FROM file_sharing")
-    results = mycursor.fetchall()
-    file_list = []
-    for result in results:
-        ip = result[0]
-        file = result[1]
-        file_list.append((ip, file))
-    return file_list
-
-################################ FUNCTION for GUI ############################################
-def getIPList():
-    mycursor.execute("SELECT ip FROM file_sharing")
-    results = mycursor.fetchall()
-    ip_list = [result[0] for result in results]  # Extract the IP addresses from the tuples
-    unique_ip = list(set(ip_list))  # Remove duplicates using set and convert back to a list
-    return unique_ip
-
-def pingSearchInDB(name): #select name co status == 1
-    ping_em(name)
-    query = """
-    SELECT username
-    FROM account
-    WHERE status = 1
-    """
-    mycursor.execute(query)
-    results = mycursor.fetchall()
-    for result in results:
-        if result[0] == name:
-            return True
-    return False
-
-def discoverGUI(name):
-    # input la hostname, kiem ip -> tra ve list file_name
-    discover(name)
-    query = f"""
-    SELECT t2.file_name
-    FROM account t1
-    JOIN file_sharing t2 ON t1.ip = t2.ip
-    WHERE t1.username = '{name}' AND t1.status = 1
-    """
-    mycursor.execute(query)
-    results = mycursor.fetchall()
-    if results is None:
-        print("Cannot find anything bro")
-        return results
-    print(f"Oh there is something in this hostname {name}\n")
-    return results
-    
+##########################################################################################################
 
 ################################ TRY TO COOK ############################################
 
 def getIPAndPortforPeerwhileFetch(fname):
-    
-    query = """SELECT a.ip, a.port_for_peer
-                FROM account a
-                JOIN file_sharing fs ON a.ip = fs.ip
-                WHERE a.status = 1 AND fs.file_name = 'fname'
-            """
-
-# Execute the query
-    mycursor.execute(query)
-# Fetch all the rows returned by the query
-    results = mycursor.fetchall()
-
-# Process the result
-    for result in result:
-        ip, port_for_peer = result
-        print(f"IP: {ip}, Port for Peer: {port_for_peer}")
-
-    return results
-
+    mycursor.execute(f"""SELECT ip,port_for_peer FROM file_sharing WHERE (file_name='{fname}')""")
+    records = mycursor.fetchall()
+    return records
 
 ##################################################################
 #---------------------------------------------------------------- Send Message to Client  --------------------------------
@@ -168,16 +95,18 @@ def handle_client(client, addr):
                 passwd_length = int(client.recv(HEADER).decode(FORMAT))
                 passwd = client.recv(passwd_length).decode(FORMAT) 
                 record = getAccountByUsername(user)
+                port_in4_length = int(client.recv(HEADER).decode(FORMAT))
+                port_in4 = client.recv(port_in4_length).decode(FORMAT)
+                port_for_server = port_in4
                 if record != []:
                     sendMessage(client, "Account has been used - 0")    
                 else:
-                    port_in4_length = int(client.recv(HEADER).decode(FORMAT))
-                    port_in4 = client.recv(port_in4_length).decode(FORMAT)
-                    port_for_server = port_in4
                     try:
                         insertUser(user,passwd,ip,port,port_for_server)
+                        sendMessage(client, "200")
                         sendMessage(client, "Account created successfully - 1")
                     except:
+                        sendMessage(client, "404")
                         sendMessage(client, "Error. Try again...")
 #==========================================LOGIN============================================
             elif message.startswith('login'):
@@ -199,9 +128,11 @@ def handle_client(client, addr):
                 else:
                     try:
                         updateUser(user,passwd,ip,port,1)
+                        sendMessage(client, "200")
                         sendMessage(client, "Kết nối thành công - 1")
                         sendMessage(client, f'Hello {user}! Welcome to our journey')
                     except Exception as e:
+                        sendMessage(client, "404")
                         sendMessage(client, "Lỗi truy vấn. Đang thử lại... - 0")
                         traceback.print_exc()
 #=============================================LOGOUT===============================================
@@ -236,7 +167,8 @@ def handle_client(client, addr):
                 else:
                 # holder_addresses = [addr for addr, files in clients.items() if any(f[1] == fname for f in files)]
                 # response = ', '.join(map(str, holder_addresses))
-                    response = str(record)
+                    record = record[0]
+                    response = str(record[0]) + " " + str(record[1])
                     print(response)
                     sendMessage(client=client, message=response)
     client.close()
@@ -246,6 +178,7 @@ def start_server():
     while True:
         client, addr = server.accept()
         thread = threading.Thread(target=handle_client, args=(client, addr))
+        thread.daemon = True
         thread.start()
         print(f"[ACTIVE CONNECTION] {threading.active_count()-1} /n")
 
@@ -266,7 +199,6 @@ def ping(admin,ip,port):
         except Exception as e:
             print(e)
     return 0
-
 def ping_em(hostname):
     admin = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     record = getIpAndPorforServer(hostname)
@@ -312,9 +244,9 @@ def discover(hostname):
     else: print('Invalid command! Please input ip and port\n')
     admin.close()
 
-
-
 #----------------------------------------------------------------
+
+
 
 if __name__ == "__main__":
 
@@ -326,13 +258,13 @@ if __name__ == "__main__":
         print("Socket error")
     print("Server started.")
     server_thread = threading.Thread(target=start_server)
+    server_thread.daemon = True
     server_thread.start()
 
-
-    ################################################################################################################
-    while True:
+    tnk_baka = True
+    ########################################### ADMIN    #####################################################################
+    while tnk_baka:
         ip,port = "",""
-        admin = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         print("Admin started.")
         cmd = input("Enter command (type 'help' for available commands): ")
         if cmd == 'help':
@@ -345,31 +277,7 @@ if __name__ == "__main__":
             except:
                 print('Invalid command! Please input ip and port\n')
                 continue
-            record = getIpAndPorforServer(hostname)
-            if record == []:
-                print("Tài khoản hoặc mật khẩu không tồn tại - 0")
-                continue
-            else:
-                ip,port = record[0][0],record[0][1]
-            connection = ping(admin,ip,port)
-            if connection == 0: 
-                print('Client offline\n')
-                updateUser(user=hostname,ip=ip,port=port,status=0)
-            elif connection == 1: 
-                print('Client online\n')
-                updateUser(user=hostname,ip=ip,port=port,status=1)
-                discover = 'discover'.encode(FORMAT)
-                cmd_length = len(discover)
-                senddiscover_length = str(cmd_length).encode(FORMAT)
-                senddiscover_length += b' ' * (HEADER - len(discover))
-                
-                admin.send(senddiscover_length)
-                admin.send(discover)
-                discover_length = int(admin.recv(HEADER).decode(FORMAT))
-                discover_data = discover.recv(discover_length).decode(FORMAT)
-                print(discover_data)
-            else: print('Invalid command! Please input ip and port\n')
-            admin.close()
+            discover(hostname)
     #==============================================================================================================================
         elif cmd.startswith('ping'):
             try:
@@ -377,25 +285,10 @@ if __name__ == "__main__":
             except:
                 print('Invalid command! Please input ip and port\n')
                 continue
-            record = getIpAndPorforServer(hostname)
-            if record == []:
-                print("Tài khoản hoặc mật khẩu không tồn tại - 0")
-                continue
-            else:
-                ip,port = record[0][0],record[0][1]
-            connection = ping(admin,ip,port)
-            if connection == 0: 
-                print('Client offline\n')
-                updateUser(user=hostname,ip=ip,port=port,status=0)
-            else: 
-                print('Client online\n')
-                updateUser(user=hostname,ip=ip,port=port,status=1)
-            admin.close()
+            ping_em(hostname)
     #====================================================================================================================
         elif cmd.startswith('exit'):
-            admin.close()
             server.close()
-            break
     #======================================================================================================
         else:
             print("Command not supported")
