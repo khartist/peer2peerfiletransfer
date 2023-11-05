@@ -198,11 +198,15 @@ class discoverView(Tk):
             for item in FILE_LIST: 
                 listbox.insert("end", item)
             #self.after(15000, update_listbox)
+
+
             scrollbar = Scrollbar(listFrame, orient='vertical')
             scrollbar.pack(side="right", fill="y")
             listbox.config(yscrollcommand=scrollbar.set)
             scrollbar.config(command=listbox.yview)
             print("Update view")
+
+            
             buttonframe = Frame(self)
             buttonframe.pack(side="bottom")
             button1=Button(buttonframe, border=0, width=20, pady=5, bg='#FFF9E3', fg='#1B365C', text="Quit", command=lambda: quit())

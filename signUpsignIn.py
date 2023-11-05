@@ -36,8 +36,8 @@ class App:
         self.clear_window()
         self.root.title("Select Path")
         ttk.Label(self.root, text="Choose Path you want to send file", font=("Arial", 15), background="#E8E8E8").pack(pady=15)
-        sth = ttk.StringVar()
-        box = ttk.Entry(self.root, textvariable=sth)
+        sth = tk.StringVar()
+        box = tk.Entry(self.root, textvariable=sth)
         client2.file_path = box.get()
         ttk.Button(self.root, text="Confirm", command=self.chooseDes()).pack(pady=5)
     
