@@ -1,8 +1,13 @@
+'''
+  _      _      _
+>(.)__ <(.)__ =(.)__
+ (___/  (___/  (___/  hjw
+'''
 from tkinter import *
 from tkinter import font
 from tkinter import Image
 import tkinter.messagebox
-import server2
+import server
 
 class FirstPage(Tk):
     def __init__(self):
@@ -53,7 +58,7 @@ class ListPage(Tk):
         # Function to update the listbox contents
         def update_listbox():
             listbox.delete(0, "end")  # Clear the listbox
-            FILE_LIST = server2.getFileList()
+            FILE_LIST = server.getFileList()
             for item in FILE_LIST: 
                 ip = item[0]
                 file = item[1]
@@ -129,7 +134,7 @@ class pingView(Tk):
 
         def respond(var):
             print(var)
-            state = server2.pingSearchInDB(var)
+            state = server.pingSearchInDB(var)
             if(state == True):
                 respondFrame = Frame(self)
                 respondFrame.pack(side="top")
@@ -193,7 +198,7 @@ class discoverView(Tk):
             label = Label(listFrame, text="File list")
             listbox = Listbox(listFrame, height=10, width=15, bg="#E3FFFC", activestyle='dotbox', font="Helvetica", fg="#050505")
             listbox.delete(0, "end")  # Clear the listbox
-            FILE_LIST = server2.discoverGUI(var)
+            FILE_LIST = server.discoverGUI(var)
             #FILE_LIST = {'a.txt','b.pdf','c.docx','d.pdf','e.pptx', 'f.txt', 'm.txt', 'xxx.txt', 'lol.exe', 'ciscoPacketTrace.txt', 'yyy.txt'}
             for item in FILE_LIST: 
                 listbox.insert("end", item)
@@ -238,7 +243,7 @@ class onlineView(Tk):
         def update_listbox():
             listbox.delete(0, "end")  # Clear the listbox
             i = 1
-            IP_LIST = server2.getIPList()
+            IP_LIST = server.getIPList()
             for item in IP_LIST:
                 listbox.insert(i, item)
                 i = i + 1

@@ -1,3 +1,11 @@
+'''
+               __
+              / _)
+     _/\/\/\_/ /
+   _|         /
+ _|  (  | (  |
+/__.-'|_|--|_|  PapaJ
+'''
 import threading
 import socket
 import json

@@ -1,3 +1,13 @@
+'''
+               __
+              / _)
+     _.----._/ /
+    /         /
+ __/ (  | (  |
+/__.-'|_|--|_|
+T-Rex
+
+'''
 import socket
 import threading
 import mysql.connector

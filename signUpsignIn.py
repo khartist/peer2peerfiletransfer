@@ -1,9 +1,17 @@
+'''
+|\---/|
+| o_o |
+ \_^_/
+ /\_/\
+( o.o )
+ > ^ <
+'''
 import tkinter as tk
 from tkinter import messagebox, ttk
 from tkinter import *
 import re
 import socket
-import client3 ###neu doi client thi doi o day lai
+import client ###neu doi client thi doi o day lai
 import json
 SERVER_IP = socket.gethostbyname(socket.gethostname()) # IP của máy chủ
 SERVER_PORT = 5050  # Port của máy chủ
@@ -63,7 +71,7 @@ class App:
 
 #=======================================================================================================
     def sign_in(self):
-        response = client3.login_user(self.username_entry.get(), self.password_entry.get())
+        response = client.login_user(self.username_entry.get(), self.password_entry.get())
         if response == False:
             messagebox.showinfo("Notification", "Sign In successfully!")
             self.choosePath() #chon path truoc roi moi vao home page
@@ -111,7 +119,7 @@ class App:
         if password != confirm_password:
             messagebox.showerror("Error", "Password confirmation does not match!")
             return
-        client3.register_user(username,password,confirm_password)
+        client.register_user(username,password,confirm_password)
         self.sign_in_page()
         
         #response = self.send_registration_data_to_server(username, password, CLIENT_IP, SERVER_PORT)
@@ -129,7 +137,7 @@ class App:
         ttk.Label(self.root, text="Choose Path you want to make your Repository", font=("Arial", 15), background="#E8E8E8").pack(pady=15)
         sth = tk.StringVar()
         box = ttk.Entry(self.root, textvariable=sth)
-        client3.file_path = box.get()
+        client.file_path = box.get()
         box.pack()
         ttk.Button(self.root, text="Confirm", command=lambda: self.update_file_path(box.get())).pack(pady=5)
     
@@ -139,7 +147,7 @@ class App:
         ttk.Label(self.root, text="Choose Path you want to publish file", font=("Arial", 15), background="#E8E8E8").pack(pady=15)
         sth = tk.StringVar()
         box = ttk.Entry(self.root, textvariable=sth)
-        client3.output_folder = box.get()
+        client.output_folder = box.get()
         box.pack()
         ttk.Button(self.root, text="Confirm", command=lambda: self.update_output_folder(box.get())).pack(pady=5)
         home_page()
@@ -182,7 +190,7 @@ class home_page(Tk):
         elif(frame_name == "publishView"):
             publishView()
         elif(frame_name =="logOut"):
-            client3.logout_user()
+            client.logout_user()
         else: print("huhu")
 
 #=========Publish view===============#
@@ -222,7 +230,7 @@ class publishView(Tk):
     def doPublish(self, args):
         lname, fname = args
         msg = "publish "+ lname + " " + fname
-        client3.publish(msg)
+        client.publish(msg)
 
 #============Fetch view=======================#
 
@@ -258,7 +266,7 @@ class fetchView(Tk):
     def doFetch(self, args):
         file = args
         msg = "fetch " + file
-        client3.fetch(msg)
+        client.fetch(msg)
         
 
 
