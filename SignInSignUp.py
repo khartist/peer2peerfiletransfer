@@ -1,12 +1,16 @@
 import tkinter as tk
 from tkinter import messagebox, ttk
+from client3 import login_user  
+from client3 import register_user
 import re
 import socket
-import json
-SERVER_IP = '127.0.0.1'  # IP của máy chủ
-SERVER_PORT = 5050  # Port của máy chủ
-CLIENT_IP = socket.gethostbyname(socket.gethostname())  # Địa chỉ IP của client
 
+
+HEADER = 64 
+FORMAT = "utf-8"
+CENTRAL_SERVER_IP = socket.gethostbyname(socket.gethostname())
+CENTRAL_SERVER_PORT = 5050  # Adjust the port as needed
+SUCCESS_MESSAGE = "Kết nối thành công - 1"
 class App:
     def __init__(self, root):
         self.root = root
@@ -32,17 +36,19 @@ class App:
         ttk.Button(self.root, text="Go to Register", command=self.sign_up_page).pack(pady=5)
 #=======================================================================================================
     def sign_in(self):
-       # response = self.send_login_data_to_server(self.username_entry.get(), self.password_entry.get())
-#        if response == "200":
- #           messagebox.showinfo("Notification", "Sign In successfully!")
-  #          self.home_page()
-   #     else: 
-    #        messagebox.showerror("Error", "Incorrect username or password!")
+        login_user(self.username_entry.get(), self.password_entry.get())
+        response = self.receive_from_server()
+        if response == "Kết nối thành công - 1":
+            messagebox.showinfo("Notification", "Sign In successfully!")
+            self.home_page()
+        else: 
+            messagebox.showerror("Error", "Incorrect username or password!")
 
   
 
 #=======================================================================================================
-    #def sign_up_page(self):
+    
+    def sign_up_page(self):
         self.clear_window()
         self.root.title("Sign In/Sgin Up")
 
@@ -63,7 +69,23 @@ class App:
         ttk.Button(self.root, text="Register", command=self.sign_up).pack(pady=20)
         ttk.Button(self.root, text="Go to Sign In", command=self.sign_in_page).pack(pady=5)
 
-    
+    def receive_from_server(self):
+        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        try:
+            client.connect((CENTRAL_SERVER_IP, CENTRAL_SERVER_PORT))
+            message_header = client.recv(HEADER)
+            if len(message_header):
+                message_length = int(message_header.decode(FORMAT).strip())
+                message = client.recv(message_length).decode(FORMAT)
+                return message
+            else:
+                return None
+        except ConnectionError:
+            messagebox.showerror("Connection Error", "Unable to connect to the server.")
+            return None
+        finally:
+            client.close()
+        
     def sign_up(self):
         username = self.new_username_entry.get()
         password = self.new_password_entry.get()
@@ -80,14 +102,15 @@ class App:
         if password != confirm_password:
             messagebox.showerror("Error", "Password confirmation does not match!")
             return
-        
-        #response = self.send_registration_data_to_server(username, password, CLIENT_IP, SERVER_PORT)
-
-      # if response == "200":
-          #  messagebox.showinfo("Notification", "Registered successfully! Please login.")
-#            self.sign_in_page()
-   #     else:
-      #      messagebox.showerror("Error", response)
+        register_user(username, password, confirm_password)
+        response = self.receive_from_server()
+        if response == "Account created successfully - 1":
+            messagebox.showinfo("Notification", "Registered successfully! Please login.")
+            self.sign_in_page()
+        elif response == "Error. Try again...":
+            messagebox.showerror("Error", response)
+        else:
+            messagebox.showerror("Error", "Account already exists! Try again...")
 
 #=======================================================================================================
     def home_page(self):
