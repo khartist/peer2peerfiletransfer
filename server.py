@@ -36,7 +36,10 @@ mycursor = mydb.cursor()
 mycursor.execute(f"""CREATE TABLE IF NOT EXISTS {User_Table1}(username VARCHAR(255) PRIMARY KEY,password VARCHAR(255),ip VARCHAR(255), port INT, port_for_server INT, port_for_peer INT, status INT)""")
 mycursor.execute(f"""CREATE TABLE IF NOT EXISTS {User_Table2}(user VARCHAR(255), local_name VARCHAR(255),file_name VARCHAR(255) PRIMARY KEY)""")
 #=========================================================================================================================================================================================
-
+def getStatus(user):
+    mycursor.execute(f"""SELECT status FROM account WHERE username='{user}'""")
+    records = mycursor.fetchall()
+    return records
 #====================================================================QUERY IN DATABASE====================================================================================================================
 def getAccountByUsername(user):
     mycursor.execute(f"""SELECT * FROM account WHERE username='{user}'""")
@@ -70,7 +73,17 @@ def getUserforPublish(ip,port):
     mycursor.execute(f"""SELECT username FROM account WHERE ip='{ip}' AND port='{port}'""")
     records = mycursor.fetchall()
     return records
+def getFileList(): #get file list
+    mycursor.execute("SELECT user,file_name FROM file_sharing")
+    results = mycursor.fetchall()
+    file_list = []
+    for result in results:
+        ip = result[0]
+        file = result[1]
+        file_list.append((ip, file))
+    return file_list
 ##########################################################################################################
+
 
 ################################ TRY TO COOK ############################################
 
@@ -277,13 +290,15 @@ def ping(admin,ip,port):
 def ping_em(hostname):
     admin = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     record = getIpAndPorforServer(hostname)
-    if record == []:
+    status = getStatus(hostname)
+    if record == [] or status == []:
         print("Tài khoản hoặc mật khẩu không tồn tại - 0")
         return
     else:
         ip,port = record[0][0],record[0][1]
+    temp = status[0][0]
     connection = ping(admin,ip,port)
-    if connection == 0: 
+    if connection == 0 or temp == 0: 
         print('Client offline\n')
         updateStatus(hostname,0)
     else: 
@@ -294,13 +309,15 @@ def ping_em(hostname):
 def discover(hostname):
     admin = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     record = getIpAndPorforServer(hostname)
-    if record == []:
+    status = getStatus(hostname)
+    if record == [] or status == []:
         print("Tài khoản hoặc mật khẩu không tồn tại - 0")
         return
     else:
         ip,port = record[0][0],record[0][1]
+    temp = status[0][0]
     connection = ping(admin,ip,port)
-    if connection == 0: 
+    if connection == 0 or temp == 0: 
         print('Client offline\n')
         updateStatus(hostname,0)
     elif connection == 1: 
@@ -321,13 +338,11 @@ def discover(hostname):
 
 #----------------------------------------------------------------
 
-
+server_thread = threading.Thread(target=start_server)
+server_thread.daemon = True
+server_thread.start()
 
 if __name__ == "__main__":
-
-    server_thread = threading.Thread(target=start_server)
-    server_thread.daemon = True
-    server_thread.start()
     
     
 
