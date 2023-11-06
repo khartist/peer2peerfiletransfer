@@ -23,7 +23,7 @@ hostname = socket.gethostname()
 file_path = None
 output_folder = None
 local_ip = socket.gethostbyname(hostname)
-local_port = 81
+local_port = 71
 flag = True
 
 
@@ -148,7 +148,7 @@ def login_user(username, password):
 
 def logout_user():
     send_to_server(central_server_socket, 'logout')
-    time.sleep(5)
+    time.sleep(2)
     exit()
 
 #=======================================================================================================
@@ -217,6 +217,7 @@ def fetch(msg):
         print(f"Error communicating with the central server: {e}")
 
 def P2P():
+    config()
     # Input your local IP and port (your address)
 #-------------------------------------------------------CLient Server side socket-----------------------------------------#
 
