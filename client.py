@@ -6,7 +6,7 @@
  _|  (  | (  |
 /__.-'|_|--|_|  PapaJ
 '''
-import threading
+iimport threading
 import socket
 import json
 import time
@@ -23,10 +23,9 @@ hostname = socket.gethostname()
 file_path = None
 output_folder = None
 local_ip = socket.gethostbyname(hostname)
-local_port = 71
+local_port = 81
 flag = True
-
-
+configg = {}
 # Load the configuration
 
 
@@ -67,7 +66,7 @@ class PeerClient(threading.Thread):
 #-------------------------------------------Receive-----------------------------------------------------------------------#
                 data = b''
                 f = open(outfile_path, 'wb')
-                self.conn.settimeout(5)
+                self.conn.settimeout(10)
                 while True:
                     try:
                         m = self.conn.recv(1024)
@@ -100,13 +99,18 @@ class PeerClient(threading.Thread):
 def config():
     global file_path
     global output_folder
-    config_file_path = r"C:\Users\Admin\OneDrive\Documents\BKU\Junior\ComputerNetworking\peer2peerfiletransfer\Assignment1\config.json"
+    config_file_path = r"C:\Users\Admin\OneDrive\Documents\BKU\Junior\ComputerNetworking\P2P\Assignment1\drazod\config.json"
     with open(config_file_path, 'r') as config_file:
         config = json.load(config_file)
 
     # Access configuration values
     file_path = config["file_path"]
     output_folder = config["output_folder"]
+
+def save_config():
+    # Save the updated configuration to the file
+    with open(config_file_path, 'w') as config_file:
+        json.dump(configg, config_file, indent=4)
 #=======================================================================================================
 #NEW
 def send_to_server(client,message):
@@ -217,7 +221,6 @@ def fetch(msg):
         print(f"Error communicating with the central server: {e}")
 
 def P2P():
-    config()
     # Input your local IP and port (your address)
 #-------------------------------------------------------CLient Server side socket-----------------------------------------#
 
@@ -260,10 +263,12 @@ def P2P():
                         config()
                         filename = message
                         openfile_path = os.path.join(file_path, filename)
-                        f = open(openfile_path, 'rb') 
-                        l = os.path.getsize(file_path)
-                        m = f.read(l)
-                        conn.sendall(m)
+                        with open(openfile_path, 'rb') as f:
+                            while True:
+                                data = f.read(1024)  # Read 1KB at a time
+                                if not data:
+                                    break
+                                conn.send(data)
                         f.close()
             except:
                 continue
@@ -294,17 +299,27 @@ if __name__ == "__main__":
             password = input("Enter password: ")
             confirm = input("Confirm password: ")
             register_user(username, password, confirm)
-        time.sleep(10)
+        time.sleep(2)
 
-    file_path = input("Enter your path to folder you want to send file:")
-    output_folder = input("Enter your path to folder you want to get file:")
+    file_path = input("Choose Path you want to make your Repository:")
+    config_file_path = r"C:\Users\Admin\OneDrive\Documents\BKU\Junior\ComputerNetworking\P2P\Assignment1\drazod\config.json"  # Adjust the path to your configuration file
+    with open(config_file_path, 'r') as config_file:
+        configg = json.load(config_file)
+        configg["file_path"] = file_path
+        save_config()
 #------------------------------------------------------------//-----------------------------------------------------------#
     while True:
         user_input = input("Enter your command: ")
         if user_input.startswith('publish'):
+            output_folder = input("Choose Path you want to publish file:")
+            with open(config_file_path, 'r') as config_file:
+                configg = json.load(config_file)
+                configg["output_folder"] = output_folder
+                save_config()
             publish(user_input)
         elif user_input.startswith('fetch'):
             fetch(user_input)
         else:
             logout_user()
         time.sleep(2)
+
