@@ -43,7 +43,7 @@ git clone https://github.com/khartist/peer2peerfiletransfer
 4. GUI Interaction:
    - Launch the GUI using the `clientGUI.py` and the `serverGUI` script. You can use the GUI to perform actions with ease.
 
-## Usage
+## Features
 1. **Sign In/Sign Up:**
    - Use the GUI to sign in with your username and password or create a new account by signing up.
 
