@@ -67,6 +67,8 @@ git clone https://github.com/khartist/peer2peerfiletransfer
 
 ## License
 
-Feel free to customize and use this project for your file transfer needs. If you encounter any issues or have suggestions for improvements, please feel free to create an issue or contribute to the project.
+This project has MIT License. Feel free to customize and use this project for your file transfer needs. If you encounter any issues or have suggestions for improvements, please feel free to create an issue or contribute to the project.
 
 Enjoy using the Peer-to-Peer File Transfer Project!
+
+From Vietnam with love.
